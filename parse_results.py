@@ -22,6 +22,9 @@ FIELDNAMES = [
     "winning_pitcher",
     "losing_pitcher",
     "save_pitcher",
+    "after_rule_change",
+    "past_10th_inning",
+    "run_differential",
 ]
 
 # Map retrosheet's unusual abbreviations to common ones
@@ -73,6 +76,7 @@ def format_row(path, row):
     tmp_row["game_id"] = row[3] + game_date.strftime("%Y%m%d") + game_number
     tmp_row["game_date"] = row[1]
     tmp_row["game_date_iso"] = game_date.strftime("%Y-%m-%d")
+    tmp_row["season"] = season_year
     tmp_row["day_of_week"] = game_date.strftime("%a")
 
     if row[4] == "@":
@@ -95,6 +99,10 @@ def format_row(path, row):
     tmp_row["winning_pitcher"] = row[13]
     tmp_row["losing_pitcher"] = row[14]
     tmp_row["save_pitcher"] = row[15]
+    tmp_row["after_rule_change"] = "Y" if int(tmp_row["season"]) >= 2020 else "N"
+    tmp_row["past_10th_inning"] = 1 if tmp_row["innings"] > 10 else 0
+    tmp_row["run_differential"] = abs(int(tmp_row["home_team_score"]) - int(tmp_row["away_team_score"]))
+
     return tmp_row
 
 
@@ -103,13 +111,14 @@ def format_retrosheet_row(row):
     tmp_row["game_id"] = abbreviation_match(row[6]) + row[0] + row[1]   # Home team + date + game number (if double-header)
     tmp_row["game_date"] = row[0]
     tmp_row["game_date_iso"] = datetime.datetime.strptime(row[0], "%Y%m%d").strftime("%Y-%m-%d")
+    tmp_row["season"] = tmp_row["game_id"][3:7]
     tmp_row["day_of_week"] = row[2]
     tmp_row["home_team"] = abbreviation_match(row[6])
     tmp_row["home_team_score"] = row[10]
     tmp_row["away_team"] = abbreviation_match(row[3])
     tmp_row["away_team_score"] = row[9]
     tmp_row["innings"] = math.ceil(int(row[11])/2.0/3.0)
-    tmp_row["is_extra_innings"] = ("Y" if (tmp_row["innings"] > 9 or (int(tmp_row["game_id"][3:4]) >= 2020 and tmp_row["game_id"][-1] != "0" and tmp_row["innings"] > 7)) else "N")
+    tmp_row["is_extra_innings"] = ("Y" if (tmp_row["innings"] > 9 or (int(tmp_row["season"]) >= 2020 and tmp_row["game_id"][-1] != "0" and tmp_row["innings"] > 7)) else "N")
     tmp_row["game_length"] = str(math.floor(int(row[18])/60)) + ":" + str(int(row[18])%60).zfill(2)
     tmp_row["game_length_minutes"] = int(row[18])
     tmp_row["day_or_night"] = row[12]
@@ -117,6 +126,9 @@ def format_retrosheet_row(row):
     tmp_row["winning_pitcher"] = row[94].split(" ")[-1].replace("(none)", "")
     tmp_row["losing_pitcher"] = row[96].split(" ")[-1].replace("(none)", "")
     tmp_row["save_pitcher"] = row[98].split(" ")[-1].replace("(none)", "")
+    tmp_row["after_rule_change"] = "Y" if int(tmp_row["season"]) >= 2020 else "N"
+    tmp_row["past_10th_inning"] = 1 if tmp_row["innings"] > 10 else 0
+    tmp_row["run_differential"] = abs(int(tmp_row["home_team_score"]) - int(tmp_row["away_team_score"]))
 
     return tmp_row
 

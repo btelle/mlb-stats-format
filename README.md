@@ -5,6 +5,7 @@ Parse game-level data from [Retrosheet](https://www.retrosheet.org/gamelogs/) an
 * game_id
 * game_date
 * game_date_iso
+* season
 * day_of_week
 * home_team
 * home_team_score
@@ -19,6 +20,9 @@ Parse game-level data from [Retrosheet](https://www.retrosheet.org/gamelogs/) an
 * winning_pitcher
 * losing_pitcher
 * save_pitcher
+* after_rule_change
+* past_10th_inning
+* run_differential
 
 ## Getting data
 
