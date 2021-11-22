@@ -7,6 +7,7 @@ FIELDNAMES = [
     "game_id",
     "game_date",
     "game_date_iso",
+    "season",
     "day_of_week",
     "home_team",
     "home_team_score",
@@ -86,7 +87,7 @@ def format_row(path, row):
         tmp_row["away_team_score"] = row[8]
 
     tmp_row["innings"] = (9 if row[9] == "" else int(row[9]))
-    tmp_row["is_extra_innings"] = ("N" if row[9] == "" else "Y")
+    tmp_row["is_extra_innings"] = ("Y" if (tmp_row["innings"] > 9 or (int(season_year) >= 2020 and tmp_row["game_id"][-1] != "0" and tmp_row["innings"] > 7)) else "N")
     tmp_row["game_length"] = row[16]
     tmp_row["game_length_minutes"] = int(row[16].split(":")[0])*60 + int(row[16].split(":")[1])
     tmp_row["day_or_night"] = row[17]
@@ -108,7 +109,7 @@ def format_retrosheet_row(row):
     tmp_row["away_team"] = abbreviation_match(row[3])
     tmp_row["away_team_score"] = row[9]
     tmp_row["innings"] = math.ceil(int(row[11])/2.0/3.0)
-    tmp_row["is_extra_innings"] = ("Y" if tmp_row["innings"] > 9 else "N")
+    tmp_row["is_extra_innings"] = ("Y" if (tmp_row["innings"] > 9 or (int(tmp_row["game_id"][3:4]) >= 2020 and tmp_row["game_id"][-1] != "0" and tmp_row["innings"] > 7)) else "N")
     tmp_row["game_length"] = str(math.floor(int(row[18])/60)) + ":" + str(int(row[18])%60).zfill(2)
     tmp_row["game_length_minutes"] = int(row[18])
     tmp_row["day_or_night"] = row[12]
